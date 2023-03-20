@@ -49,6 +49,7 @@ def output_csv(
         if total_solv_atoms != removed_atoms:
             atom_count_match = False
 
+        file = os.path.basename(file)
         # forming output row to append to the csv
         output_row = [
             file,

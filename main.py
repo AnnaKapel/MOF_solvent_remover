@@ -104,11 +104,6 @@ def worker(file):
 
         # getting the coordinates of the atoms for removal
         solvent_coordinates = get_coordinates(mol, solvents_to_remove)
-        
-        ######## test ##########
-        # mol_no_solvent = remove_solvent(mol, solvents_to_remove)
-        # with CrystalWriter('test_cif.cif') as filehandle:
-        #     filehandle.write(mol)
 
         # putting together dictionary of otput stats
         output_solvent_stats = {
@@ -119,8 +114,6 @@ def worker(file):
         }
 
         total_solv_atoms = len(solvents_to_remove)
-
-        print("--- %s seconds ---" % (time.time() - start_time_MOF))
 
         # removing solvent from cif file if solvent is present
         if solvent_present_flag:
@@ -150,7 +143,6 @@ if __name__ == "__main__":
 
     files = [os.path.join(cwd, file) for file in os.listdir(cwd) if file.endswith(".cif")]
 
-    print(files)
     print(f"### {len(files)} .cif file(s) detected in {cwd} ###")
 
     pool = Pool(processes = args.n_processes)
