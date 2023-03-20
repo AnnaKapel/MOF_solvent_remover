@@ -106,11 +106,6 @@ def get_coordinates(molecule, solvents):
             atoms_coordinates.append(coord_unit)
     return atoms_coordinates
 
-
-def write_output_cif():
-    pass
-
-
 def remove_solvents_from_file(lines, coordinates):
     """Goes through the cif file and removes the lines that correspond
     to the atoms that shoulb be removed. Works as a text parcer coparing strings
