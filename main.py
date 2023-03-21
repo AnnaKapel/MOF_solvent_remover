@@ -25,18 +25,18 @@ parser.add_argument(
 )
 parser.add_argument(
     "-v", "--verbose", action="store_true", help="if set, turns off outputs"
-
 )
 parser.add_argument(
-    "-keep_bound", action="store_true", help="if set, bound solvent is not removed"
+    "--keep_bound", action="store_true", help="if set, bound solvent is not removed"
 )
 args = parser.parse_args()
 
 cwd = args.files_path
 output_dir = args.export_path
+keep_bound = args.keep_bound
 
 def worker(file):
-    try:
+    # try:
         start_time_MOF = time.time()
         print(f"Analyzing {file}...")
         input_cif = file
@@ -77,29 +77,42 @@ def worker(file):
             solvent_stats_batch1,
         ) = remove_free_solvent(mol, rAON_atomlabels)
         
-        # identifying the oxo molecules
-        oxo_mols, solvent_stats_batch2 = get_oxo(uniquesites, file)
+        #if the user wants to keep bound solvent skipping further steps
+        if not keep_bound:
+            # identifying the oxo molecules
+            oxo_mols, solvent_stats_batch2 = get_oxo(uniquesites, file)
 
-        # removes metals from the molecule
-        molecule_no_metals = remove_metals(molecule_work)
+            # removes metals from the molecule
+            molecule_no_metals = remove_metals(molecule_work)
 
-        # creates the initial list of possible solvents
-        solvent_mols, solvent_stats_batch3 = define_solvents(
-            molecule_no_metals, rAON_atomlabels
-        )
+            # creates the initial list of possible solvents
+            solvent_mols, solvent_stats_batch3 = define_solvents(
+                molecule_no_metals, rAON_atomlabels
+            )
 
-        # rewriting binding sites as labels
-        binding_sites_labels = [site.label for site in binding_sites]
+            # rewriting binding sites as labels
+            binding_sites_labels = [site.label for site in binding_sites]
 
-        # check the possible solvents
-        solvent_mols_checked, solvent_stats_batch4 = check_solvent(
-            solvent_mols, binding_sites_labels, mol, uniquesites
-        )
+            # check the possible solvents
+            solvent_mols_checked, solvent_stats_batch4 = check_solvent(
+                solvent_mols, binding_sites_labels, mol, uniquesites
+            )
 
-        # combine all the lists of items to remove
-        solvents_to_remove = get_solvents_to_remove(
-            solvent_mols_checked, free_solvents, counterions, oxo_mols
-        )
+            # combine all the lists of items to remove
+            solvents_to_remove = get_solvents_to_remove(
+                solvent_mols_checked, free_solvents, counterions, oxo_mols,
+            )
+
+            # putting together dictionary of otput stats
+            output_solvent_stats = {
+            **solvent_stats_batch1,
+            **solvent_stats_batch2,
+            **solvent_stats_batch3,
+            **solvent_stats_batch4,
+            }
+        else:
+            solvents_to_remove = free_solvents + counterions
+            output_solvent_stats = solvent_stats_batch1
 
         # checking if there is any solvent
         solvent_present_flag = False
@@ -108,14 +121,6 @@ def worker(file):
 
         # getting the coordinates of the atoms for removal
         solvent_coordinates = get_coordinates(mol, solvents_to_remove)
-
-        # putting together dictionary of otput stats
-        output_solvent_stats = {
-            **solvent_stats_batch1,
-            **solvent_stats_batch2,
-            **solvent_stats_batch3,
-            **solvent_stats_batch4,
-        }
 
         total_solv_atoms = len(solvents_to_remove)
 
@@ -127,25 +132,23 @@ def worker(file):
 
         # output a csv with solvent removal stats
         output_row = output_csv(
-            output_solvent_stats, solvent_present_flag, total_solv_atoms, file, removed_atoms
+            output_solvent_stats, solvent_present_flag, total_solv_atoms, file,
+            removed_atoms, keep_bound
         )
 
         if not args.verbose:
-            command_line_output(output_solvent_stats, solvent_present_flag)
+            command_line_output(output_solvent_stats, solvent_present_flag, keep_bound)
 
         print("--- %s seconds ---" % (time.time() - start_time_MOF))
 
         return output_row
     
-    except Exception as e:
-        print(f'ERROR >>>>> {file}')
+    # except Exception as e:
+    #     print(f'ERROR >>>>> {file}')
 
 
 if __name__ == "__main__":
     start_time = time.time()
-
-    export_df_path = os.path.join(args.export_path, "Solvent_removal_results.csv")
-    failed_cifs_path = os.path.join(args.export_path, "Filed_cifs.txt")
 
     files = [os.path.join(cwd, file) for file in os.listdir(cwd) if file.endswith(".cif")]
 
@@ -155,21 +158,6 @@ if __name__ == "__main__":
 
     for res in pool.imap(worker, files):
         if res is not None:
-            if os.path.exists(export_df_path):
-                with open(export_df_path, 'a',  newline='') as file_obj:
-                    writerObj = csv.writer(file_obj)
-                    writerObj.writerow(res)        
-            else:
-                with open(export_df_path, 'w',  newline='') as fileObj:
-                    writerObj = csv.writer(fileObj)
-                    writerObj.writerow(['CIF', 'Solvent', 'Bound solvent', 'Number of bound mols', 
-                                        'Free solvent', 'Number of free solvent molecules',
-                                        'Counterions', 'Number of counterions', 'Terminal oxo',
-                                        'Number of terminal oxo', 'Charge_removed', 'Total atoms',
-                                        'Atoms removed', 'atoms_match_flag', 'flag_double',
-                                        'flag_aromatic', 'Metal counterion flag', 'terminal_oxo_flag',
-                                        'Entry terminal oxo', 'huge_counterion_flag', 'OH_removed',
-                                        'oxo_OH'])
-                    writerObj.writerow(res)
+            export_res(res, keep_bound, output_dir)
 
     print("--- %s seconds ---" % (time.time() - start_time))
