@@ -36,6 +36,7 @@ def command_line_output(solvent_stats, solvent_present_flag):
 def output_csv(
     solvent_stats, solvent_present_flag, total_solv_atoms, file, removed_atoms
 ):
+    file = os.path.basename(file)
 
     # forming output row depending on presence of solvent
     if solvent_present_flag:
@@ -49,7 +50,6 @@ def output_csv(
         if total_solv_atoms != removed_atoms:
             atom_count_match = False
 
-        file = os.path.basename(file)
         # forming output row to append to the csv
         output_row = [
             file,

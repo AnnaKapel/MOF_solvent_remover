@@ -25,6 +25,10 @@ parser.add_argument(
 )
 parser.add_argument(
     "-v", "--verbose", action="store_true", help="if set, turns off outputs"
+
+)
+parser.add_argument(
+    "-keep_bound", action="store_true", help="if set, bound solvent is not removed"
 )
 args = parser.parse_args()
 
@@ -72,7 +76,7 @@ def worker(file):
             counterions,
             solvent_stats_batch1,
         ) = remove_free_solvent(mol, rAON_atomlabels)
-
+        
         # identifying the oxo molecules
         oxo_mols, solvent_stats_batch2 = get_oxo(uniquesites, file)
 
@@ -118,6 +122,8 @@ def worker(file):
         # removing solvent from cif file if solvent is present
         if solvent_present_flag:
             removed_atoms = output_cif(output_dir, file, solvent_coordinates, cwd)
+        else:
+            removed_atoms = 0
 
         # output a csv with solvent removal stats
         output_row = output_csv(
