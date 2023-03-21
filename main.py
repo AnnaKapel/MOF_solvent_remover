@@ -36,7 +36,7 @@ output_dir = args.export_path
 keep_bound = args.keep_bound
 
 def worker(file):
-    # try:
+    try:
         start_time_MOF = time.time()
         print(f"Analyzing {file}...")
         input_cif = file
@@ -143,8 +143,8 @@ def worker(file):
 
         return output_row
     
-    # except Exception as e:
-    #     print(f'ERROR >>>>> {file}')
+    except Exception as e:
+        print(f'ERROR >>>>> {file}')
 
 
 if __name__ == "__main__":
