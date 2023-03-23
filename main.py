@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
     print(f"### {len(files)} .cif file(s) detected in {cwd} ###")
 
-    pool = Pool(processes = args.n_processes)
+    pool = Pool(processes = int(args.n_processes))
 
     for res in pool.imap(worker, files):
         if res is not None:

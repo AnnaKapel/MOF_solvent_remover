@@ -252,7 +252,9 @@ def delocalisedLBO(molecule):
         return atomlist
 
     delocal_dict = {}
-    for atom in molecule.atoms:
+    # Handle cases where ccdc.Molecule() or atom list is input
+    molecule = molecule if isinstance(molecule, list) else molecule.atoms
+    for atom in molecule:
         if all(
             [
                 (any(bond.bond_type == "Delocalised" for bond in atom.bonds)),
