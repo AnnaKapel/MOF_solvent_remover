@@ -6,7 +6,16 @@ from .cif_manipulation import remove_solvents_from_file
 
 
 def command_line_output(solvent_stats, solvent_present_flag, keep_bound):
-    """Printing information to the terminal"""
+    """
+    Printing information to the terminal
+    
+    Parameters:
+        solvent_stats (list): list of solvent atom labels
+        solvent_present_flag (bool): True if solvent is present
+        keep_bound (bool): True if argument passed to argparse - doesn't remove bound solvent
+    Returns:
+        nothing
+    """
     if solvent_present_flag:
         if solvent_stats.get("free_solvent_flag"):
             free_solvent = solvent_stats.get("free_solvents_output")
@@ -39,6 +48,20 @@ def output_csv(
     solvent_stats, solvent_present_flag, total_solv_atoms, file, 
     removed_atoms, keep_bound
 ):
+    """
+    Forms a row for the solvent statistics that is appended to output csv.
+    There are two types of rows: for all solvent removed and for only free solvent removed.
+
+    Parameters:
+        solvent_stats (list): list of atom labels of solvent.
+        solvent_present_flag (bool): True if solvent was detected.
+        total_solv_atoms (int): total number of solvent atoms.
+        file (str): filename in format *.cif.
+        removed_atoms (int): number of atoms actually removed with parcer.
+        keep_bound (bool): True if argument passed to argparse - doesn't remove bound solvent
+    Returns:
+        output_row (list): formatted list of items for the csv cellss
+    """
     file = os.path.basename(file)
     
     #forming stats for free + bound solvent export
@@ -159,6 +182,17 @@ def output_csv(
     return output_row
 
 def output_cif(path, file, solvent_coordinates, cwd):
+    """
+    Outputs a new cif file without solvent if solvent was detected.
+
+    Parameters:
+        path (str): path to the output folder.
+        file (str): filename *.cif.
+        solvent_coordinates (list): list of lists of coordinates (x,y,z).
+        cwd (str): path to current working directory.
+    Returns:
+        removed_atoms (int): number of atoms that were removed from .cif file by the parcer.
+    """
     output_directory = os.path.join(path, "MOFs_removed_solvent")
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
@@ -175,14 +209,18 @@ def output_cif(path, file, solvent_coordinates, cwd):
 
     return removed_atoms
 
+def export_res(res, keep_bound, output_dir):   
+    """
+    Function to process the result of the pool process.
+    Result is a row of statistics for the output csv.
 
-def remove_solvent(mol, solvents_to_remove):
-    for atom in mol.atoms:
-        if atom.label in solvents_to_remove:
-            mol.remove_atom(atom)
-    return mol
-
-def export_res(res, keep_bound, output_dir):        
+    Parameters:
+        res (list): row of statisctics output for the output csv.
+        keep_bound (bool): True if argument passed to argparse - doesn't remove bound solvent
+        output_dir (str): path to output directory
+    Returns:
+        nothing, outputs a csv
+    """
     if keep_bound:
         export_df_path = os.path.join(output_dir, "Free_solvent_removal_results.csv")
         columns = ['CIF', 'Solvent', 'Free solvent', 'Number of free solvent molecules',

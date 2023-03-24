@@ -40,14 +40,14 @@ def worker(file):
         start_time_MOF = time.time()
         print(f"Analyzing {file}...")
         input_cif = file
+
         # read in the .cif, extract the underlying molecule,
         # identify the unique sites, metal sites, binding sites
-
         cif = readentry(input_cif)
         mol = cif.molecule
         asymmol = cif.asymmetric_unit_molecule
 
-        uniquesites = get_unique_sites(mol, asymmol)
+        uniquesites = get_unique_sites(mol, asymmol) 
         metalsites = get_metal_sites(uniquesites)
         binding_sites = get_binding_sites(
             metalsites, uniquesites
@@ -95,7 +95,7 @@ def worker(file):
 
             # check the possible solvents
             solvent_mols_checked, solvent_stats_batch4 = check_solvent(
-                solvent_mols, binding_sites_labels, mol, uniquesites
+                solvent_mols, binding_sites_labels, uniquesites
             )
 
             # combine all the lists of items to remove

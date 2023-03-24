@@ -3,6 +3,16 @@ from ccdc import descriptors, molecule
 
 
 def get_unique_sites(mole, asymmole):
+    """
+    Get the unique atoms in a MOF structure that belong to the asymmetric unit.
+
+    Parameters:
+        mole (ccdc.molecule.Molecule): The MOF structure to get unique atoms from.
+        asymmole (ccdc.molecule.Molecule): The asymmetric unit of the MOF structure.
+
+    Returns:
+        uniquesites (list): list of ccdc.atom.Atom: A list of unique atoms in the MOF structure that belong to the asymmetric unit.
+    """
     # blank list for unique sites
     uniquesites = []
     labels = []
@@ -47,14 +57,32 @@ def get_unique_sites(mole, asymmole):
 
 
 def get_metal_sites(sites):
+    """
+    Get the metal sites in a MOF structure that belong to the asymmetric unit.
+
+    Parameters:
+        sites (list of ccdc.atom.Atom): A list of unique atoms in the MOF structure that belong to the asymmetric unit.
+
+    Returns:
+        metalsites (list): list of ccdc.atom.Atom: A list of metal sites in the MOF structure that belong to the asymmetric unit.
+    """
     metalsites = []
     for site in sites:
         if site.is_metal is True:
             metalsites.append(site)
     return metalsites
 
-
 def get_binding_sites(metalsites, uniquesites):
+    """
+    Get the binding sites in a MOF structure, given the list of unique metal atoms and all unique atoms in the MOF.
+
+    Parameters:
+        metalsites (list of ccdc.atom.Atom): A list of unique metal atoms in the MOF.
+        uniquesites (list of ccdc.atom.Atom): A list of unique atoms in the MOF.
+
+    Returns:
+        binding_sites (set): set of ccdc.atom.Atom: A set of binding sites in the MOF structure that connect metal atoms and ligands.
+    """
     binding_sites = set()
     for metal in metalsites:
         for ligand in metal.neighbours:
@@ -64,6 +92,14 @@ def get_binding_sites(metalsites, uniquesites):
     return binding_sites
 
 def ringVBOs(mole):
+    """
+    Calcalates the VBO (valence bond order) for each atom in the MOF.
+
+    Parameters:
+        mole (ccdc.molecule.Molecule): molecule object of MOF structure
+    Returns:
+        ringVBO (dict): a dictionary with the VBO (valence bond order) of each atom, with the atom's index in mole.atoms as the key
+    """
     ringVBO = {}
     unassigned = mole.atoms
     ringcopy = mole.copy()
@@ -193,9 +229,16 @@ def ringVBOs(mole):
 
 
 def assign_VBS(atom, rVBO, dVBO):
-    """This function will assign a Valence-Bond-Sum (VBS) to an atom.
-    Takes one CCDC atom object, list of binding sites, and the metal-free
-    molecule object as inputs"""
+    """
+    Assigns a Valence-Bond-Sum (VBS) to an atom.
+
+    Parameters:
+        atom (ccdc.atom.Atom): atom object
+        rVBO (dict): a dictionary with the VBO (valence bond order) of each atom, with the atom's index in mole.atoms as the key
+        dVBO (dict): a dictionary of atoms with delocalized bonds and their corresponding (delocalized-only) VBS.
+    Returns:
+        VBO (int): valence bond sum value
+    """
     VBO = 0
     if atom.is_metal:
         return 0
@@ -222,11 +265,18 @@ def assign_VBS(atom, rVBO, dVBO):
 
 
 def delocalisedLBO(molecule):
-    """returns a dict of all atoms with
-    delocalised bonds and their (delocalized-only) VBS"""
-
+    """
+    Takes a ccdc.molecule.Molecule as input and writes a dictionary of all atoms in the molecule with delocalized bonds and their (delocalized-only) VBS
+    
+    Parameters:
+        molecule (ccdc.molecule.Molecule): MOF molecule object.
+    Returns:
+        delocal_dict (dict): a dictionary of atoms with delocalized bonds and their corresponding (delocalized-only) VBS.
+    """
+    
     def TerminusCounter(atomlist):
-        """Counts the number of termini in the delocalized bond system.
+        """
+        Counts the number of termini in the delocalized bond system.
         takes a list of all atoms and list of all bonds in the delocalized system as inputs.
         """
         NTerminus = 0
@@ -240,8 +290,10 @@ def delocalisedLBO(molecule):
         return NTerminus
 
     def delocal_crawl(atomlist):
-        """returns a list of all atoms in a delocalised system,
-        takes at least one delocalised bonding atom as input"""
+        """
+        Returns a list of all atoms in a delocalised system,
+        takes at least one delocalised bonding atom as input
+        """
         for delocatom in atomlist:
             for bond in delocatom.bonds:
                 if bond.bond_type == "Delocalised":
@@ -280,7 +332,9 @@ def delocalisedLBO(molecule):
     return delocal_dict
 
 def get_CN(atom):
-    """returns the coordination number of an atom"""
+    """
+    Returns the coordination number of an atom
+    """
     CN = 0
     for neighbour in atom.neighbours:
         if not neighbour.is_metal:
@@ -289,7 +343,14 @@ def get_CN(atom):
 
 
 def valence_e(elmnt):
-    """returns number of valence electrons of an element"""
+    """
+    Returns number of valence electrons of an element
+    
+    Parameters:
+        elmnt (ccdc.atom.Atom): atom object
+    Returns:
+        valence (int): valence of the atom
+    """
     atom = mendeleev.element(elmnt.atomic_symbol)
     if atom.block == "s":
         valence = atom.group_id
@@ -312,8 +373,14 @@ def valence_e(elmnt):
 
 
 def carbocation_check(atom):
-    """geometry checker for carbocations/carbanions returns
-    tetrahedral(anion) or trigonal(cation) depending on bond angles"""
+    """
+    Geometry checker for carbocations/carbanions
+    
+    Parameters:
+        atom (ccdc.atom.Atom): atom object
+    Returns:
+        "tetrahedral" or "trigonal"
+    """
     abc = []
     # get atom neighbours
     for neighbours in atom.neighbours:
@@ -336,8 +403,14 @@ def carbocation_check(atom):
 
 
 def carbene_type(atom):
-    """distinguishes between singlet and triplet carbenes,
-    only input suspected carbene atoms (2-coordinate carbon II)"""
+    """
+    Distinguishes between singlet and triplet carbenes
+
+    Parameters:
+        atom (ccdc.atom.Atom): atom object suspected of being carbene (2-coordinate carbon II)
+    Returns:
+        "singlet" or "triplet"        
+    """
     # get alpha-atoms
     alpha = atom.neighbours
     alpha_type = []
@@ -364,10 +437,16 @@ def carbene_type(atom):
 
 
 def iVBS_Oxidation_Contrib(unique_atoms, rVBO, dVBO):
-    """determines the oxidation state contribution for all
-    unique atoms in a MOF. Returns a dictionary of Atom:Oxidaiton_Contribution
-    pairs. Takes the unique sites in the MOF (without metal), the MOF molecule
-    object (without metal) and a list of metal-binding sites as inputs"""
+    """
+    Determines the oxidation state contribution for all
+    unique atoms in a MOF. 
+    Parameters:
+        unique_atoms (list of ccdc.atom.Atom): unique atoms in the MOF that belong to the assymetric unit
+        rVBO (dict): a dictionary with the VBO (valence bond order) of each atom, with the atom's index in mole.atoms as the key
+        dVBO (dict): a dictionary of atoms with delocalized bonds and their corresponding (delocalized-only) VBS.
+    Returns:
+        oxi_contrib (dict): dictionary of Atom:Oxidaiton_Contribution
+    """
     VBS = 0
     CN = 0
     valence = 0
@@ -455,6 +534,14 @@ def iVBS_Oxidation_Contrib(unique_atoms, rVBO, dVBO):
 
 
 def redundantAON(AON, molecule):
+    """
+    Takes the oxidation contributions of atoms in unique sites and assings them to the atoms in redundant sites based on equality of atom labels.
+    Parameters:
+        AON (dict): dictionary of Atom:Oxidaiton_Contribution.
+        molecule (ccdc.molecule.Molecule): molecule object of the MOF.
+    Returns:
+        redAON (dict): dictionary atom: oxidation contribution for all atoms in the MOF.
+    """
     redAON = {}
     for rsite1 in molecule.atoms:
         for usite1 in AON:

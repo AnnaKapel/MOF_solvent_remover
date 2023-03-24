@@ -2,9 +2,15 @@ from ccdc import crystal, io
 
 
 def readentry(input_cif):
-    """reads the input cif into a CCDC.Crystal type object,
-    and converts to standard atom labelling convention
-    (necessary for the rest of the code to function properly"""
+    """
+    Reads a CIF file containing molecular structure data and converts it to a standard atom labeling convention using the CCDC.Crystal module.
+
+        Parameters:
+            input_cif (str): The filename of the CIF file containing the molecular structure data.
+            
+        Returns:
+            newcif (CCDC.Crystal object): A CCDC.Crystal object containing the molecular structure data in the standard atom labeling convention.
+    """
 
     # read in the cif to a crystal object
     with io.CrystalReader(input_cif, format="cif") as readcif:
@@ -74,7 +80,15 @@ def readentry(input_cif):
 
 
 def get_coordinates(molecule, solvents):
-    """Gets the coordinate lists of the individual atoms for removal
+    """
+    Gets the coordinate lists of the individual atoms for removal
+    Coordinates are trimmed to 5 decimal places
+
+    Parameters:
+        molecule (ccdc.molecule.Molecule): full MOF structure
+        solvents (list): list of atom labels of solvents for removal
+    Returns:
+        atoms_coordicates (list): list of lists of 3 coordinates of each atom for removal. x, y, z 
 
     Returns: a list of lits of three atom coordinates as str with 5 decimal places"""
     atoms_coordinates = []
@@ -106,16 +120,18 @@ def get_coordinates(molecule, solvents):
             atoms_coordinates.append(coord_unit)
     return atoms_coordinates
 
-
-def write_output_cif():
-    pass
-
-
 def remove_solvents_from_file(lines, coordinates):
-    """Goes through the cif file and removes the lines that correspond
-    to the atoms that shoulb be removed. Works as a text parcer coparing strings
+    """
+    Goes through the cif file and removes the lines that correspond
+    to the atoms that shoulb be removed. Works as a text parcer by comparing strings
 
-    Returns: a list of strings that are the lines that should be kept in the file"""
+    Parameters:
+        lines (list): list of strings that correspond to individual lines of the cif file
+        coordinates (list): list of 3 items lists (x,y,z coordinates), 5 decimal points
+    Returns:
+        lines (list): edited lines without strings that correspond to removed atoms
+        atom_count (int): number of atoms that were removed from file
+    """
     atom_labels = []
     atom_count = 0
 
