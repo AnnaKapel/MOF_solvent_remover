@@ -29,11 +29,15 @@ parser.add_argument(
 parser.add_argument(
     "--keep_bound", action="store_true", help="if set, bound solvent is not removed"
 )
+parser.add_argument(
+    '--keep_oxo', action="store_true", help="if set, terminal oxygens are not removed"
+)
 args = parser.parse_args()
 
 cwd = args.files_path
 output_dir = args.export_path
 keep_bound = args.keep_bound
+keep_oxo = args.keep_oxo
 
 def worker(file):
     try:
@@ -80,7 +84,7 @@ def worker(file):
         #if the user wants to keep bound solvent skipping further steps
         if not keep_bound:
             # identifying the oxo molecules
-            oxo_mols, solvent_stats_batch2 = get_oxo(uniquesites, file)
+            oxo_mols, solvent_stats_batch2 = get_oxo(uniquesites, file, keep_oxo)
 
             # removes metals from the molecule
             molecule_no_metals = remove_metals(molecule_work)

@@ -187,42 +187,28 @@ def get_refcode(file):
     ref_code = file.replace(".cif", "")
     if "\\" or "/" in ref_code:
         ref_code = os.path.basename(ref_code)
-    if ref_code.isupper() is True and "_" not in ref_code:
-        return ref_code
     if "_" in ref_code:
         pos = ref_code.find("_")
         ref_code = ref_code[:pos]
         return ref_code
+    return ref_code
 
-def get_oxo(molecule, file):
+def check_entry(file):
     """
-    Getting the terminal oxygens from the molecule that are supposed to
-    be removed as water. Filters out the real oxo and flags if there are
-    any terminal oxygens present.
-
-    Parameters: 
-        molecule (ccdc.molecule.Molecule): molecule object of the MOF.
+    Checks the name of the MOF in the CSD entry if it contains something
+    related to -oxo-
+    
+    Parameters:
         file (str): filename in format *.cif.
-    Returns:
-        terminal_oxo (list of atom labels): list of labels of oxygen atoms considered water without hydrogens for removal.
-        statistics_output (dict): collecting stats for output
+    Returns: 
+        entry_oxo (bool or str): True if the oxo is present in the entry, False if not. Returns 'Invalid' if failed to access CCDC using the refcode
     """
+    entry_oxo = False
 
-    def check_entry(file):
-        """
-        Checks the name of the MOF in the CSD entry if it contains something
-        related to -oxo-
-        
-        Parameters:
-            file (str): filename in format *.cif.
-        Returns: 
-            True if the oxo is present in the entry, False if not
-        """
-        global entry_oxo
-        entry_oxo = False
+    # getting MOF information from CSD
+    ref_code = get_refcode(file)
 
-        # getting MOF information from CSD
-        ref_code = get_refcode(file)
+    try:
         csd_reader = EntryReader("CSD")
         mof = csd_reader.entry(ref_code)
 
@@ -250,11 +236,27 @@ def get_oxo(molecule, file):
             for oxo_name in oxo_names:
                 if oxo_name in name:
                     entry_oxo = True
+    except:
+        #if can't access entry removes all oxo
+        print('WARNING: refcode is not found in CCDC - all oxygen atoms suspected of being water will be removed if --keep_oxo was not passed as argument. This can be caused by inconsistend filename (refcode is extracted from filename) or absence of your MOF in CCDC. Rename your file to AAAAAA.cif or AAAAAA_xxx.cif and try again.')
+        entry_oxo = 'FAILED REFCODE'
+    
+    return entry_oxo
+    
+def get_oxo(molecule, file, keep_oxo):
+    """
+    Getting the terminal oxygens from the molecule that are supposed to
+    be removed as water. Filters out the real oxo and flags if there are
+    any terminal oxygens present.
 
-        if entry_oxo is True:
-            return True
-        else:
-            return False
+    Parameters: 
+        molecule (ccdc.molecule.Molecule): molecule object of the MOF.
+        file (str): filename in format *.cif.
+        keep_oxo (bool): argument, if set all the terminal oxygens are not removed.
+    Returns:
+        terminal_oxo (list of atom labels): list of labels of oxygen atoms considered water without hydrogens for removal.
+        statistics_output (dict): collecting stats for output
+    """
 
     terminal_oxo_flag = False
     oxo_OH = False
@@ -262,7 +264,9 @@ def get_oxo(molecule, file):
     # list of the most probable metals to have oxo on them
     most_probable_oxo = ["W", "U", "Mo", "V", "Np", "Ti"]
     terminal_oxo = []
+
     oxo_present = check_entry(file)
+        
     possible_oxo = []
     corresponding_metals = []
     # writes to list of possible oxo atoms and the metals that correspond to them
@@ -288,7 +292,10 @@ def get_oxo(molecule, file):
     If there are no most probable metals, all the oxos are kept.
 
     If the entry says that the oxos are not present:
-    All the oxos are removed"""
+    All the oxos are removed
+    
+    If refcode is not found in CCDC:
+    All oxos are removed"""
 
     # skipping further steps if no oxo
     if len(possible_oxo) != 0:
@@ -312,9 +319,12 @@ def get_oxo(molecule, file):
 
         if len(terminal_oxo) > 0:
             terminal_oxo_flag = True
+    
+    if keep_oxo:
+        terminal_oxo = []
 
     statistics_output = {
-        "entry_oxo": entry_oxo,
+        "entry_oxo": oxo_present,
         "terminal_oxo_flag": terminal_oxo_flag,
         "oxo_OH": oxo_OH,
         "oxo_mols": terminal_oxo,
