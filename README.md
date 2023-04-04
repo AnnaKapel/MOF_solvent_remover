@@ -24,7 +24,7 @@ python main.py --data_path <path to the folder with MOFs> --export_path <path to
 ```
 
 
-## Solvent removal options - flags
+## Solvent removal options - arguments
 
  - `--data_path` Provide the path to the folder with input MOFs
  - `--export_path` Provide path to the output folder
