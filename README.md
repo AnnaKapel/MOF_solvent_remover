@@ -18,8 +18,10 @@ Program was designed to work with CIF files.
  - **MOF is considered a periodic structure**
 
 ## Running the code
-`cd <path_to_folder>`
-`python main.py --data_path <path to the folder with MOFs> --export_path <path to the export folder>`
+```
+cd <path_to_folder>
+python main.py --data_path <path to the folder with MOFs> --export_path <path to the export folder>
+```
 
 
 ## Solvent removal options - flags
