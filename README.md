@@ -17,6 +17,11 @@ Program was designed to work with CIF files.
  - **P1 symmetry** (You can convert your MOFs using Materials Studio or get them in P1 from CSD using this code https://github.com/uowoolab/CSD-cleaner - 100% compatible)
  - **MOF is considered a periodic structure**
 
+## Running the code
+`cd <path_to_folder>`
+`python main.py --data_path <path to the folder with MOFs> --export_path <path to the export folder>`
+
+
 ## Solvent removal options - flags
 
  - `--data_path` Provide the path to the folder with input MOFs
