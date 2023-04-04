@@ -229,7 +229,7 @@ def export_res(res, keep_bound, output_dir):
                             'Metal counterion flag', 'huge_counterion_flag']
     else:
         export_df_path = os.path.join(output_dir, "Solvent_removal_results.csv")
-        columns = ['CIF', 'Solvent', 'Bound solvent', 'Number of bound mols', 
+        columns = ['CIF', 'Solvent', 'Bound solvent', 'Number of bound molecules', 
                             'Free solvent', 'Number of free solvent molecules',
                             'Counterions', 'Number of counterions', 'Terminal oxo',
                             'Number of terminal oxo', 'Charge_removed', 'Total atoms',
