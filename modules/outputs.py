@@ -223,20 +223,20 @@ def export_res(res, keep_bound, output_dir):
     """
     if keep_bound:
         export_df_path = os.path.join(output_dir, "Free_solvent_removal_results.csv")
-        columns = ['CIF', 'Solvent', 'Free solvent', 'Number of free solvent molecules',
-                            'Counterions', 'Number of counterions', 'Charge_removed', 
-                            'Total atoms', 'Atoms removed', 'atoms_match_flag', 
-                            'Metal counterion flag', 'huge_counterion_flag']
+        columns = ['CIF', 'Solvent', 'Free_solvent', 'Number_of_free_solvent_molecules',
+                            'Counterions', 'Number_of_counterions', 'Charge_removed', 
+                            'Total_atoms', 'Atoms_removed', 'Atoms_match_flag', 
+                            'Metal_counterion_flag', 'Huge_counterion_flag']
     else:
         export_df_path = os.path.join(output_dir, "Solvent_removal_results.csv")
-        columns = ['CIF', 'Solvent', 'Bound solvent', 'Number of bound molecules', 
-                            'Free solvent', 'Number of free solvent molecules',
-                            'Counterions', 'Number of counterions', 'Terminal oxo',
-                            'Number of terminal oxo', 'Charge_removed', 'Total atoms',
-                            'Atoms removed', 'atoms_match_flag', 'flag_double',
-                            'flag_aromatic', 'Metal counterion flag', 'terminal_oxo_flag',
-                            'Entry terminal oxo', 'huge_counterion_flag', 'OH_removed',
-                            'oxo_OH']
+        columns = ['CIF', 'Solvent', 'Bound_solvent', 'Number_of_bound molecules', 
+                            'Free_solvent', 'Number_of_free_solvent_molecules',
+                            'Counterions', 'Number_of_counterions', 'Terminal_oxo',
+                            'Number_of_terminal_oxo', 'Charge_removed', 'Total_atoms',
+                            'Atoms_removed', 'Atoms_match_flag', 'Flag_double',
+                            'Flag_aromatic', 'Metal_counterion_flag', 'Terminal_oxo_flag',
+                            'Entry_terminal_oxo', 'Huge_counterion_flag', 'OH_removed',
+                            'Oxo_OH']
         
     if os.path.exists(export_df_path):
         with open(export_df_path, 'a',  newline='') as file_obj:

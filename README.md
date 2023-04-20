@@ -33,30 +33,31 @@ python main.py --data_path <path to the folder with MOFs> --export_path <path to
  - `--keep_bound` Keeps the bound solvent in the MOF
  - `--keep_oxo` Keeps all the terminal oxygens
 ## Outputs
-**MOFs_removed_solvent folde**r contains all the edited structures that had solvent removed
+**MOFs_removed_solvent folder** contains all the edited structures that had solvent removed
 
 If --keep_bound - **Free_solvent_removal_results.csv** - description of columns:
 
  - **CIF** - Filename
  - **Solvent** - YES or NO if no solvent identified
- - **Free solvent** - list of atoms grouped by molecules in free solvent
+ - **Free_solvent** - list of atoms grouped by molecules in free solvent
  - Number of free solvent molecules
  - **Counterions** - list of atoms grouped by molecules in counterions (charged fragments)
- - **Number of counterions**
+ - **Number_of_counterions**
  - **Charge_removed** - total charge removed from structure, can be positive, negative or 0
- - **Total atoms** - total atoms detected as solvent
- - **Atoms removed** - total atoms removed from CIF by the parcer
+ - **Total_atoms** - total atoms detected as solvent
+ - **Atoms_removed** - total atoms removed from CIF by the parcer
  - **atoms_match_flag** - TRUE if the cif parcer left out any atoms -> Total atoms and Atoms removed don't match
- - **Metal counterion flag** - TRUE if identified counterion that contains metals -> higher chance of wrong charge assignment
- - **huge_counterion_flag** - TRUE if there are structures with counterions with a lof of metals and high mass that the code fails to assign charges to 
+ - **Metal_counterion_flag** - TRUE if identified counterion that contains metals -> higher chance of wrong charge assignment
+ - **Huge_counterion_flag** - TRUE if there are structures with counterions with a lof of metals and high mass that the code fails to assign charges to 
 
 If all solvent should be removed - **Solvent_removal_results.csv** - additional columns:
 
- - **Bound solvent** -  list of atoms grouped by molecules in bound solvent
- - **Number of bound molecules**
- - **flag_double** - flags if there are double bonds near the binding cite
- - **flag_aromatic** - flags if there are aromatic solvents removed
- - **Entry terminal oxo** - the script checks the CSD entry to determine if there are terminal oxygens in the structure. True if terminal oxo is present in the entry, FAILED REFCODE if the refcode in the filename wasn't found in the CSD
+ - **Bound_solvent** -  list of atoms grouped by molecules in bound solvent
+ - **Number_of_bound_molecules**
+ - **Flag_double** - flags if there are double bonds near the binding cite
+ - **Flag_aromatic** - flags if there are aromatic solvents removed
+ - **Terminal_oxo_flag** - flags if oxo atoms were removed
+ - **Entry_terminal_oxo** - the script checks the CSD entry to determine if there are terminal oxygens in the structure. True if terminal oxo is present in the entry, FAILED REFCODE if the refcode in the filename wasn't found in the CSD
  - **OH_removed** - the code removes OH bound to the metals because statistically they are most often water with missing hydrogens.
 If it does so, it flags the molecule so you can check If it is actually OH or water with missing H
- - **oxo_OH** - identifies terminal oxo atoms that likely can be OH or water on the atoms that can have those issues (U and Zr)
+ - **Oxo_OH** - identifies terminal oxo atoms that likely can be OH or water on the atoms that can have those issues (U and Zr)
