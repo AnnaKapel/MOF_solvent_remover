@@ -6,8 +6,6 @@ This program was designed to clean CIF files of Metal-Organic Frameworks (MOFs) 
 This code requires CSD Python API ([https://www.ccdc.cam.ac.uk/solutions/csd-core/components/csd-python-api/](https://www.ccdc.cam.ac.uk/solutions/csd-core/components/csd-python-api/)). You can install it from the source.
 
 Other dependencies:
-
- - pandas
  - mendeleev
 
 ## File requirements
